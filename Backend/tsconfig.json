@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",           // <-- Change this line
+    "moduleResolution": "node",     // <-- Change this line
+
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    "types": ["node"],
+
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  }
+}
