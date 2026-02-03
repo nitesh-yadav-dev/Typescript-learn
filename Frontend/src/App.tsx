@@ -18,12 +18,12 @@ function App() {
       }
       setInput("");
   }
-
 const handleEdit = (id: number, title: string)=>{
   dispatch(setEditTodo(id))
   setInput(title);
 }
 
+console.log("Testing")
 
   return (
     <div style={{ padding: 20 }}>
