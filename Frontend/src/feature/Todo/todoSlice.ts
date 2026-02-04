@@ -1,15 +1,20 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import type { Todo } from "../../types/todo";
+import { createTodo, fetchTodo, deleteTodoOne } from "./todoThunk";
 
 
 type TodeState = {
     todos: Todo[];
-    editId: number | null
+    editId: number | null;
+    loading: boolean;
+    error: string| null;
 }
 
 const initialState: TodeState = {
     todos:[],
     editId: null,
+    loading: false,
+    error: null
 }
 
 
@@ -17,41 +22,52 @@ const todoSlice = createSlice({
     name: "todo",
     initialState,
     reducers:{
-        addTodo(state, action:PayloadAction<string>){
-            state.todos.push({
-                id:Date.now(),
-                title:action.payload,
-                completed:false
-            })
-        },
-        toggleTodo(state, action:PayloadAction<number>){
-            const todo = state.todos.find(td => td.id === action.payload);
-            if(todo){
-                todo.completed  = !todo.completed;
-            }
-        },
-        deleteTodo(state, action:PayloadAction<number>){
-            state.todos = state.todos.filter(td => td.id !== action.payload);
-        },
-        setEditTodo(state, action:PayloadAction<number>){
-            state.editId = action.payload;
-        },
-        updateTodo(state, action:PayloadAction<string>){
-            const todo = state.todos.find(td => td.id === state.editId);
-            if(todo){
-                todo.title  = action.payload;
-            }
-            state.editId = null;       
-         }
+    },
+    extraReducers(builder) {
+        builder
+        .addCase(fetchTodo.pending, (state)=>{
+            state.loading = true;
+            state.error = null;
+        })
+        .addCase(fetchTodo.fulfilled, (state, action)=>{
+            state.loading = false;
+            state.todos = action.payload
+        })
+        .addCase(fetchTodo.rejected, (state, action)=>{
+            state.loading = false;
+            state.error  = action.payload as string
+        })
+        .addCase(createTodo.pending, (state)=>{
+            state.loading = true;
+            state.error = null;
+        })
 
-    }
+        .addCase(createTodo.fulfilled, (state)=>{
+            state.loading = false;
+           state.error = null;
+        })
+        .addCase(createTodo.rejected, (state, action)=>{
+            state.loading = false;
+            state.error  = action.payload as string
+        })
+
+        .addCase(deleteTodoOne.pending, (state)=>{
+            state.loading = true;
+            state.error = null;
+        })
+
+        .addCase(deleteTodoOne.fulfilled, (state)=>{
+            state.loading = false;
+           state.error = null;
+        })
+        .addCase(deleteTodoOne.rejected, (state, action)=>{
+            state.loading = false;
+            state.error  = action.payload as string
+        })
+    },
 })
 export const {
-    addTodo,
-    toggleTodo,
-    deleteTodo,
-    setEditTodo,
-    updateTodo,
+
 } = todoSlice.actions
 
 export default todoSlice.reducer;

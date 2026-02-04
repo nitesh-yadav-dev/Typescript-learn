@@ -1,28 +1,38 @@
-import { useState } from 'react'
-
+import { useEffect, useState } from 'react'
 import './App.css'
 import { useAppDispatch, useAppSelector } from './app/hooks'
-import { addTodo, deleteTodo, setEditTodo, toggleTodo, updateTodo } from './feature/Todo/todoSlice'
+import { createTodo, deleteTodoOne, fetchTodo, updateTodoOne } from './feature/Todo/todoThunk'
 
 function App() {
   const [input, setInput] = useState<string>("")
   const dispatch = useAppDispatch();
-  const {todos, editId} = useAppSelector(state => state.todo)
+  const [editId, setEditId] = useState<string|null>(null)
 
   const handleAdd = ():void =>{
       if(!input.trim()) return;
+      const payload = {
+        title: input
+      }
       if(editId !== null){
-         dispatch(updateTodo(input));
+        const updatePayload = {
+          title: input,
+          _id: editId
+        }
+         dispatch(updateTodoOne(updatePayload));
       }else{
-        dispatch(addTodo(input));
+        dispatch(createTodo(payload));
       }
       setInput("");
   }
-const handleEdit = (id: number, title: string)=>{
-  dispatch(setEditTodo(id))
+const handleEdit = (_id: string, title: string)=>{
+  setEditId(_id)
   setInput(title);
 }
 
+const {todos}  = useAppSelector((state)=> state.todo) 
+useEffect(()=>{
+  dispatch(fetchTodo())
+}, [dispatch])
 
 
   return (
@@ -41,7 +51,7 @@ const handleEdit = (id: number, title: string)=>{
 
       {todos.map((data) => (
         <div
-          key={data.id}
+          key={data._id}
           style={{
             display: "flex",
             alignItems: "center",
@@ -52,13 +62,13 @@ const handleEdit = (id: number, title: string)=>{
           <input
             type="checkbox"
             checked={data.completed}
-            onChange={() => dispatch(toggleTodo(data.id))}
+            // onChange={() => dispatch(toggleTodo(data._id))}
           />
           <h3 style={{ textDecoration: data.completed ? "line-through" : "none" }}>
             {data.title}
           </h3>
-          <button onClick={() => dispatch(deleteTodo(data.id))}>Delete</button>
-          <button onClick={() => handleEdit(data.id, data.title)}>Edit</button>
+          <button onClick={() => dispatch(deleteTodoOne(data._id))}>Delete</button>
+          <button onClick={() => handleEdit(data._id, data.title)}>Edit</button>
         </div>
       ))}
     </div>
