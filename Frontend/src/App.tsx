@@ -23,7 +23,7 @@ const handleEdit = (id: number, title: string)=>{
   setInput(title);
 }
 
-console.log("Testing again")
+
 
   return (
     <div style={{ padding: 20 }}>
